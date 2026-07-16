@@ -41,5 +41,11 @@ export async function GET(req: NextRequest) {
 		return NextResponse.redirect(new URL('/?verified=true', req.url))
 	} catch (error) {
 		console.error('[VERIFY_GET]', error)
+
+		if (error instanceof NextResponse) {
+			return error
+		}
+
+		return NextResponse.json({ error: 'Ошибка сервера' }, { status: 500 })
 	}
 }

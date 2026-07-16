@@ -1,6 +1,6 @@
 'use client'
 
-import { FC, JSX, useEffect, useState } from 'react'
+import { FC, JSX, Suspense, useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Container } from '@/components/shared/container'
 import SearchInput from './searchInput'
@@ -17,9 +17,9 @@ interface IProps {
 	className?: string
 }
 
-const Header: FC<IProps> = ({ hasSearch = true, hasCart = true, className }): JSX.Element => {
-	const [openModalAuth, setOpenModalAuth] = useState(false)
-
+// useSearchParams должен жить внутри Suspense, иначе прод-сборка падает при
+// статическом пре-рендере (см. https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout)
+const VerifiedToast = (): null => {
 	const searchParams = useSearchParams()
 
 	useEffect(() => {
@@ -28,10 +28,19 @@ const Header: FC<IProps> = ({ hasSearch = true, hasCart = true, className }): JS
 				toast.success('Аккаунт успешно подтвержден')
 			}, 1000)
 		}
-	}, [])
+	}, [searchParams])
+
+	return null
+}
+
+const Header: FC<IProps> = ({ hasSearch = true, hasCart = true, className }): JSX.Element => {
+	const [openModalAuth, setOpenModalAuth] = useState(false)
 
 	return (
 		<header className={cn('border-b', className)}>
+			<Suspense fallback={null}>
+				<VerifiedToast />
+			</Suspense>
 			<Container className="flex-row py-8">
 				{/* Левая часть */}
 				<Link href={'/'} className="flex-row gap-4">
