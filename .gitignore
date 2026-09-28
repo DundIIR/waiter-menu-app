@@ -32,6 +32,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...но пример без секретов коммитим — это шаблон конфигурации
+!.env.example
 
 # vercel
 .vercel

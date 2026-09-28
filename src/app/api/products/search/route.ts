@@ -5,10 +5,17 @@ export async function GET(req: NextRequest) {
 	const query = req.nextUrl.searchParams.get('query') || ''
 	const limit = req.nextUrl.searchParams.get('limit') || ''
 
-	const products = await prisma.product.findMany({
-		where: { name: { contains: query, mode: 'insensitive' } },
+	const dishes = await prisma.dish.findMany({
+		where: {
+			isPublished: true,
+			name: { contains: query, mode: 'insensitive' },
+		},
 		take: limit ? parseInt(limit) : 10,
+		include: {
+			ingredients: true,
+			allergens: true,
+		},
 	})
 
-	return NextResponse.json(products)
+	return NextResponse.json(dishes)
 }

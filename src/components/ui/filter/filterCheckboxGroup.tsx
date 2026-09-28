@@ -5,6 +5,9 @@ import { cn } from '@/lib/utils'
 import FilterCheckbox, { IFilterCheckbox } from './filterCheckbox'
 import { Input } from '../input'
 import { Skeleton } from '../skeleton'
+import FilterModeTitle from './filterModeTitle'
+import SelectAllCheckbox from './selectAllCheckbox'
+import { FilterMode } from '@/store/filters'
 
 type Item = IFilterCheckbox
 
@@ -15,6 +18,11 @@ interface IProps {
 	limit?: number
 	searchInputPlaceholder?: string
 	onClickCheckbox?: (id: string) => void
+	/** Массовое выделение; без него кнопка «Выбрать все» не показывается */
+	onToggleAll?: (values: string[], selected: boolean) => void
+	/** Режим группы; без onToggleMode заголовок остаётся обычным текстом */
+	mode?: FilterMode
+	onToggleMode?: () => void
 	defaultValue?: string[]
 	values?: Set<string>
 	nameGroup?: string
@@ -28,6 +36,9 @@ const FilterCheckboxGroup: FC<IProps> = ({
 	limit = 5,
 	searchInputPlaceholder = 'Поиск...',
 	onClickCheckbox,
+	onToggleAll,
+	mode = 'include',
+	onToggleMode,
 	defaultValue,
 	values,
 	nameGroup,
@@ -50,9 +61,15 @@ const FilterCheckboxGroup: FC<IProps> = ({
 					.slice(0, limit)
 			: items.filter(item => item.text.toLowerCase().includes(searchValue.toLowerCase()))
 
+	// Считаем по видимому списку: при активном поиске «Выбрать все» относится
+	// к найденным значениям, а не ко всей группе
+	const visibleValues = list.map(item => item.value)
+
+	const showToggleAll = showAll && Boolean(onToggleAll) && visibleValues.length > 0
+
 	return (
 		<div className={cn('', className)}>
-			{title && <p className="font-bold mb-3">{title}</p>}
+			{title && <FilterModeTitle text={title} mode={mode} onToggleMode={onToggleMode} />}
 			{showAll && (
 				<div className="mb-5">
 					<Input
@@ -60,6 +77,19 @@ const FilterCheckboxGroup: FC<IProps> = ({
 						value={searchValue}
 						onChange={onChangeSearch}
 						className="bg-gray-50 border-none"
+					/>
+				</div>
+			)}
+
+			{/* Стоит над прокручиваемым списком, поэтому остаётся на месте при скролле */}
+			{showToggleAll && onToggleAll && (
+				<div className="mb-4 pb-4 pr-2 border-b border-b-neutral-100">
+					<SelectAllCheckbox
+						values={visibleValues}
+						selected={values}
+						onToggleAll={onToggleAll}
+						nameGroup={nameGroup}
+						className="font-bold"
 					/>
 				</div>
 			)}

@@ -6,7 +6,7 @@ import { CartItemDTO } from '@/types/cart.dto'
 import { sendEmail } from '@/components/shared/emailSendMessage/sendEmail'
 import { OrderSuccessTemplate } from '@/components/shared/emailSendMessage/orderSuccessTemplate'
 
-export async function POST(req: NextResponse) {
+export async function POST(req: NextRequest) {
 	try {
 		const body = (await req.json()) as PaymentCallbackData
 
@@ -43,7 +43,7 @@ export async function POST(req: NextResponse) {
 			// TODO письмо о не успешной оплате
 		}
 
-		return NextResponse
+		return NextResponse.json({ message: 'OK' }, { status: 200 })
 	} catch (error) {
 		console.error('[CHECKOUT_CALLBACK_ERROR]', error)
 
