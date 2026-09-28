@@ -1,9 +1,10 @@
-import { Ingredient, PizzaSize, PizzaType, Product, ProductItem } from '@prisma/client'
+import { Allergen, Category, Dish, Ingredient } from '@prisma/client'
 
-export type ProductWithRelations = Product & {
-	variations: ProductItem[]
+export type DishWithRelations = Dish & {
 	ingredients: Ingredient[]
+	allergens: Allergen[]
 }
 
-export type IPizzaSize = PizzaSize
-export type IPizzaType = PizzaType
+export type CategoryWithDishes = Category & {
+	dishes: DishWithRelations[]
+}

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Header from '@/components/shared/header'
+import DishModal from '@/components/shared/modals/dishModal'
 
 export const metadata: Metadata = {
 	title: 'DoDo & Next.js',
@@ -17,6 +18,7 @@ export default function RootLayout({
 			<Header />
 			{children}
 			{modal}
+			<DishModal />
 		</main>
 	)
 }

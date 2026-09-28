@@ -10,6 +10,7 @@ import ProfileButton from './profileButton'
 import AuthModal from './modals/authModal/authModal'
 import { useSearchParams } from 'next/navigation'
 import toast from 'react-hot-toast'
+import Image from 'next/image'
 
 interface IProps {
 	hasSearch?: boolean
@@ -37,14 +38,14 @@ const Header: FC<IProps> = ({ hasSearch = true, hasCart = true, className }): JS
 	const [openModalAuth, setOpenModalAuth] = useState(false)
 
 	return (
-		<header className={cn('border-b', className)}>
+		<header className={cn('border-b bg-white', className)}>
 			<Suspense fallback={null}>
 				<VerifiedToast />
 			</Suspense>
 			<Container className="flex-row py-8">
 				{/* Левая часть */}
-				<Link href={'/'} className="flex-row gap-4">
-					<svg
+				<Link href={'/'} className="flex-row gap-1">
+					{/* <svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="40"
 						height="42"
@@ -69,11 +70,11 @@ const Header: FC<IProps> = ({ hasSearch = true, hasCart = true, className }): JS
 								<path fill="#fff" d="M49 0h201v42H49z"></path>
 							</clipPath>
 						</defs>
-					</svg>
-					{/* <Image src={'/logo.png'} alt="logo" width={35} height={35} /> */}
+					</svg> */}
+					<Image src={'/logo.ico'} alt="logo" width={44} height={44} />
 					<div className="flex flex-col">
-						<h1 className="text-2xl uppercase font-black">DoDo&Next.js</h1>
-						<p className="text-base text-gray-400 leading-3">вкусней уже некуда</p>
+						<h1 className="text-2xl uppercase font-black">Waiter ЮГ</h1>
+						<p className="text-base text-gray-400 leading-3">меню Южан</p>
 					</div>
 				</Link>
 

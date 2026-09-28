@@ -3,94 +3,79 @@
 import { FC, JSX } from 'react'
 import { cn } from '@/lib/utils'
 import { Title } from '../ui/title'
-import { Input } from '../ui/input'
-import { RangeSlider } from '../ui/filter/rangeSlider'
-import FilterCheckboxGroup from '../ui/filter/filterCheckboxGroup'
+// Старая группа с чекбоксами (ui/filter/filterCheckboxGroup) осталась в проекте,
+// но сайдбар теперь собран из заголовка-переключателя и мультиселекта
+import FilterModeTitle from '../ui/filter/filterModeTitle'
+import MultiSelect from '../ui/filter/multiSelect'
+import { Button } from '../ui/button'
 import { useFilterIngredients } from '@/hooks/use-ingredients'
+import { useFilterAllergens } from '@/hooks/use-allergens'
 import { useFilters } from '@/hooks/use-filters'
-import { pizzaSizes, pizzaTypes } from '@/constants/pizza'
 
 interface IProps {
 	className?: string
 }
 
 const Filters: FC<IProps> = ({ className }): JSX.Element => {
-	const { ingredientOptions } = useFilterIngredients()
+	const { ingredientOptions, loading: ingredientsLoading } = useFilterIngredients()
+	const { allergenOptions, loading: allergensLoading } = useFilterAllergens()
 	const {
 		selectedIngredients,
-		selectedSizes,
-		selectedTypes,
-		price,
+		selectedAllergens,
 		setIngredients,
-		setSizes,
-		setTypes,
-		setPrice,
-		updatePrice,
+		setAllergens,
+		selectIngredients,
+		selectAllergens,
+		ingredientsMode,
+		allergensMode,
+		toggleIngredientsMode,
+		toggleAllergensMode,
+		reset,
 	} = useFilters()
+
+	// Режимы тоже часть состояния фильтров, поэтому «по умолчанию» — это
+	// пустой выбор и обе группы на включение
+	const isDefault =
+		selectedIngredients.size === 0 &&
+		selectedAllergens.size === 0 &&
+		ingredientsMode === 'include' &&
+		allergensMode === 'include'
 
 	return (
 		<div className={cn('my-5', className)}>
 			<Title text="Фильтрация" size="sm" className="mb-5 font-bold" />
 
-			{/* Верхние чекбоксы */}
-			<div className="flex flex-col gap-4">
-				<FilterCheckboxGroup
-					nameGroup="sizes"
-					title="Размер пиццы"
-					items={pizzaSizes.map(size => ({ text: size.name, value: size.value }))}
-					onClickCheckbox={setSizes}
-					values={selectedSizes}
+			<div className="border-y border-y-neutral-100 py-6">
+				<FilterModeTitle
+					text="Ингредиенты"
+					mode={ingredientsMode}
+					onToggleMode={toggleIngredientsMode}
 				/>
-				<FilterCheckboxGroup
-					nameGroup="types"
-					title="Тип теста"
-					items={pizzaTypes.map(type => ({ text: type.name, value: type.value }))}
-					onClickCheckbox={setTypes}
-					values={selectedTypes}
-				/>
-			</div>
-
-			{/* Фильтрация цены */}
-			<div className="mt-5 border-y border-y-neutral-100 py-6 pb-7">
-				<p className="font-bold mb-3">Цена от и до:</p>
-				<div className="flex gap-3 mb-5">
-					<Input
-						type="number"
-						placeholder="0"
-						min={100}
-						max={5000}
-						value={price.priceFrom ?? 0}
-						onChange={e => updatePrice('priceFrom', Number(e.target.value))}
-					/>
-					<Input
-						type="number"
-						min={100}
-						max={5000}
-						placeholder="5000"
-						value={price.priceTo ?? 5000}
-						onChange={e => updatePrice('priceTo', Number(e.target.value))}
-					/>
-				</div>
-				<RangeSlider
-					min={100}
-					max={5000}
-					step={10}
-					value={[price.priceFrom ?? 0, price.priceTo ?? 5000]}
-					onValueChange={([priceFrom, priceTo]) => setPrice({ priceFrom, priceTo })}
-				/>
-			</div>
-
-			{/* Нижние чекбоксы */}
-			<div className="my-5">
-				<FilterCheckboxGroup
-					title={'Ингредиенты:'}
+				<MultiSelect
 					nameGroup="ingredients"
-					items={ingredientOptions}
-					defaultItems={ingredientOptions.slice(0, 5)}
-					onClickCheckbox={setIngredients}
+					options={ingredientOptions}
 					values={selectedIngredients}
+					onToggle={setIngredients}
+					onToggleAll={selectIngredients}
+					loading={ingredientsLoading}
 				/>
 			</div>
+
+			<div className="my-5">
+				<FilterModeTitle text="Аллергены" mode={allergensMode} onToggleMode={toggleAllergensMode} />
+				<MultiSelect
+					nameGroup="allergens"
+					options={allergenOptions}
+					values={selectedAllergens}
+					onToggle={setAllergens}
+					onToggleAll={selectAllergens}
+					loading={allergensLoading}
+				/>
+			</div>
+
+			<Button variant="outline" onClick={reset} disabled={isDefault} className="w-full mt-2">
+				Сбросить фильтры
+			</Button>
 		</div>
 	)
 }

@@ -2,111 +2,15 @@
 
 import { TCheckoutForm } from '@/components/shared/checkout/schemas/checkoutFormSchema'
 import { prisma } from '../../prisma/prisma-client'
-import { OrderStatus, Prisma } from '@prisma/client'
-import { cookies } from 'next/headers'
+import { Prisma } from '@prisma/client'
 import { sendEmail } from '@/components/shared/emailSendMessage/sendEmail'
-import { PayOrderTemplate } from '@/components/shared/emailSendMessage/payOrderTemplate'
-import { createPayment } from '@/components/shared/payment/createPayment'
 import { GetServerSession } from '@/lib/getServerSession'
 import { hashSync } from 'bcrypt'
 import { VerificationUserTemplate } from '@/components/shared/emailSendMessage/verificationUserTemplate'
 import { unknown } from 'zod'
 
 export async function createOrder(data: TCheckoutForm): Promise<string | undefined> {
-	try {
-		const cookieStore = await cookies()
-		const token = cookieStore.get('cartToken')?.value
-
-		if (!token) {
-			throw new Error('Отсутствует токен корзины')
-		}
-
-		const cart = await prisma.cart.findFirst({
-			where: {
-				token,
-			},
-			include: {
-				items: {
-					include: {
-						ingredients: true,
-						productItem: {
-							include: {
-								product: true,
-							},
-						},
-					},
-				},
-			},
-		})
-
-		if (!cart) {
-			throw new Error('Корзин не найдена')
-		} else if (cart.totalAmount === 0) {
-			throw new Error('Корзина пустая')
-		}
-
-		const order = await prisma.order.create({
-			data: {
-				token: token,
-				totalAmount: cart.totalAmount,
-				address: data.address,
-				fullName: data.lastName + ' ' + data.firstName,
-				phone: data.phone,
-				status: OrderStatus.PENDING,
-				items: JSON.stringify(cart.items),
-			},
-		})
-
-		const paymentData = await createPayment({
-			amount: order.totalAmount,
-			orderId: String(order.id),
-			description: `Заказ №${order.id}`,
-			email: data.email,
-		})
-
-		if (!paymentData) {
-			throw new Error('Не удалось создать платеж')
-		}
-
-		await prisma.order.update({
-			where: {
-				id: order.id,
-			},
-			data: {
-				paymentId: paymentData.id,
-			},
-		})
-
-		await sendEmail(
-			data.email,
-			'Next Pizza | Оплата заказа',
-			PayOrderTemplate({
-				orderId: order.id,
-				totalAmount: order.totalAmount,
-				paymentLink: paymentData.confirmation.confirmation_url,
-			}),
-		)
-
-		await prisma.cart.update({
-			where: {
-				id: cart.id,
-			},
-			data: {
-				totalAmount: 0,
-			},
-		})
-
-		await prisma.cartItem.deleteMany({
-			where: {
-				cartId: cart.id,
-			},
-		})
-
-		return paymentData.confirmation.confirmation_url
-	} catch (error) {
-		console.error('[CREATE_ORDER_ERROR]', error)
-	}
-
+	console.error('[CREATE_ORDER_DISABLED] Оформление заказа отключено на этом этапе', data)
 	return undefined
 }
 

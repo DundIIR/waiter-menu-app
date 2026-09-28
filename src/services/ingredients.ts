@@ -7,3 +7,9 @@ export const getAll = async (): Promise<Ingredient[]> => {
 
 	return data
 }
+
+export const create = async (name: string, imageUrl: string): Promise<Ingredient> => {
+	const { data } = await axiosInstance.post<Ingredient>(ApiRoutes.INGREDIENTS, { name, imageUrl })
+
+	return data
+}

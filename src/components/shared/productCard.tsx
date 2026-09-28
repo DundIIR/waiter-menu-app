@@ -1,61 +1,64 @@
+'use client'
+
 import { FC, JSX } from 'react'
 import { cn } from '@/lib/utils'
-import Link from 'next/link'
 import Image from 'next/image'
 import { Title } from '../ui/title'
-import { Button } from '../ui/button'
-import { Plus } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { Ingredient } from '@prisma/client'
+import { DishWithRelations } from '@/types/prisma'
+import { useDishModalStore } from '@/store/dishModal'
+
+type ProductCardVariant = 'default' | 'filled'
 
 interface IProps {
-	id: number
-	name: string
-	price: number
-	imageUrl: string
-	ingredients: Ingredient[]
+	dish: DishWithRelations
+	/** `filled` — фоновый квадрат растянут на всю карточку, название и состав лежат на нём */
+	variant?: ProductCardVariant
 	className?: string
 }
 
-const ProductCard: FC<IProps> = ({
-	id,
-	name,
-	price,
-	imageUrl,
-	ingredients,
-	className,
-}): JSX.Element => {
-	const router = useRouter()
+const ProductCard: FC<IProps> = ({ dish, variant = 'default', className }): JSX.Element => {
+	const openDish = useDishModalStore(state => state.openDish)
+	const isFilled = variant === 'filled'
 
 	return (
-		<Link href={`/product/${id}`} prefetch className={cn('cursor-pointer', className)}>
-			<div className="flex justify-center items-center p-6 bg-secondary rounded-lg h-[260px] overflow-hidden group">
+		<div
+			role="button"
+			tabIndex={0}
+			onClick={() => openDish(dish)}
+			onKeyDown={e => {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault()
+					openDish(dish)
+				}
+			}}
+			className={cn('cursor-pointer', isFilled && 'bg-secondary rounded-2xl p-3 shadow-sm', className)}>
+			<div
+				className={cn(
+					'relative flex justify-center items-center p-6 h-[260px] overflow-hidden group',
+					!isFilled && 'bg-secondary rounded-lg'
+				)}>
 				<Image
 					width={215}
 					height={215}
-					src={imageUrl}
-					alt="pizza"
+					src={dish.imageUrl}
+					alt={dish.name}
 					className="w-[215px] h-[215px] object-contain translate-y-2 transition-transform duration-150 ease-out group-hover:scale-110 group-hover:-translate-y-0"
 				/>
-			</div>
-			<Title text={name} size="sm" className="mb-1 mt-3 font-bold" />
-			<p className="text-sm text-gray-400">{ingredients.map(item => item.name).join(', ')}</p>
 
-			<div className="flex justify-between items-center mt-4">
-				<span className="text-[20px]">
-					<b>от {price} ₽</b>
+				<span
+					className={cn(
+						'absolute flex items-baseline gap-2 rounded-[8px] bg-[hsl(32_100%_94%)]',
+						isFilled ? 'bottom-0 left-0 px-3 py-2' : 'bottom-3 left-3 px-2.5 py-1'
+					)}>
+					<b className="text-sm leading-none">{Math.round(dish.price / 100)} ₽</b>
+					<span className="text-xs leading-none text-gray-400">{dish.weight} г</span>
 				</span>
-
-				{/* {count ? (
-						<span value={count} size="lg" />
-					) : ( */}
-				<Button variant="secondary">
-					<Plus size={16} className=" mr-1" />
-					Добавить
-				</Button>
-				{/* )} */}
 			</div>
-		</Link>
+			<div className={cn(isFilled && 'mt-3')}>
+				<Title text={dish.name} size="sm" className={cn('mb-1 font-bold', !isFilled && 'mt-3')} />
+				<p className="text-sm text-gray-400 line-clamp-2">{dish.ingredients.map(item => item.name).join(', ')}</p>
+			</div>
+		</div>
 	)
 }
 

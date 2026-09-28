@@ -6,6 +6,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { User } from '@prisma/client'
 import toast from 'react-hot-toast'
 import { signOut } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { FormInput } from '../formInput'
 import { Title } from '@/components/ui/title'
 import { Container } from '../../container'
@@ -18,6 +19,8 @@ interface Props {
 }
 
 export const ProfileForm: React.FC<Props> = ({ data }) => {
+	const router = useRouter()
+
 	const form = useForm({
 		resolver: zodResolver(formRegisterSchema),
 		defaultValues: {
@@ -66,6 +69,17 @@ export const ProfileForm: React.FC<Props> = ({ data }) => {
 					<Button disabled={form.formState.isSubmitting} className="text-base mt-10" type="submit">
 						Сохранить
 					</Button>
+
+					{data.role === 'ADMIN' && (
+						<Button
+							onClick={() => router.push('/admin')}
+							variant="outline"
+							disabled={form.formState.isSubmitting}
+							className="text-base"
+							type="button">
+							Админка
+						</Button>
+					)}
 
 					<Button
 						onClick={onClickSignOut}

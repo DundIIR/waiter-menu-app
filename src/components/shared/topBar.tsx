@@ -3,7 +3,6 @@
 import { FC, JSX, useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 import Categories from './categories'
-import SortPopup from './sortPopup'
 import { Container } from './container'
 
 interface IProps {
@@ -31,7 +30,6 @@ const TopBar: FC<IProps> = ({ className }): JSX.Element => {
 			)}>
 			<Container className="flex-row ">
 				<Categories />
-				<SortPopup />
 			</Container>
 		</div>
 	)

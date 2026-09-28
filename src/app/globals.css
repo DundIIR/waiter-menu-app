@@ -37,7 +37,7 @@
 	--popover: hsl(0 0% 100%);
 	--popover-foreground: hsl(20 14.3% 4.1%);
 
-	--primary: hsl(22 100% 50%);
+	--primary: #f8af03;
 	--primary-foreground: hsl(60 9.1% 97.8%);
 
 	--secondary: hsl(32 100% 98%);
@@ -54,12 +54,25 @@
 
 	--border: hsl(20 5.9% 90%);
 	--input: hsl(0 0% 90%);
-	--ring: hsl(24.6 95% 53.1%);
+	--ring: hsl(234, 100%, 47%);
 	--radius: 1rem;
 }
 
 html {
 	scroll-behavior: smooth;
+	/* Место под скроллбар зарезервировано всегда: иначе при фильтре, который
+	   не находит блюд, страница становится короче, скроллбар пропадает и
+	   контент прыгает вправо на его ширину */
+	scrollbar-gutter: stable;
+}
+
+/* Radix-модалки (react-remove-scroll) на время блокировки скролла добавляют
+   body отступ справа, компенсируя исчезающий скроллбар. С scrollbar-gutter
+   место уже зарезервировано, и эта компенсация сдвигала бы контент дважды.
+   Селектор специфичнее исходного (html + body[...]) — их !important не мешает */
+html body[data-scroll-locked] {
+	margin-right: 0 !important;
+	padding-right: 0 !important;
 }
 
 @media screen and (prefers-reduced-motion: reduce) {

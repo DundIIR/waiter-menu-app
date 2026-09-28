@@ -2,10 +2,9 @@ import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
 	images: {
-		// Разрешённые источники картинок. dodostatic — временно, от исходного проекта.
-		remotePatterns: [
-			{ protocol: 'https', hostname: 'media.dodostatic.net' },
-		],
+		// Админка принимает произвольный URL картинки (решение: URL-поле, без
+		// загрузки файлов) — источник заранее неизвестен, поэтому разрешён любой https-хост.
+		remotePatterns: [{ protocol: 'https', hostname: '**' }],
 	},
 
 	// ВРЕМЕННО: проект переезжает с шаблона dodo на приложение для официантов.

@@ -16,9 +16,14 @@ export default function Layout({
 	return (
 		<html lang="ru">
 			<head>
-				<link rel="icon" href="https://dodopizza.ru/favicon-48x48.png" />
+				<link rel="icon" href="/public/logo.ico" />
 			</head>
 			<body className={`${nunito.className} antialiased scrollbar`}>
+				{/* Фоновое изображение временно отключено
+				<div
+					className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat"
+					style={{ backgroundImage: 'url(/background.jpg)' }}
+				/> */}
 				<Providers>{children}</Providers>
 			</body>
 		</html>
