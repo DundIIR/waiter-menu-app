@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '../../../../../prisma/prisma-client'
 import { updateCartTotalAmount } from '@/lib/updateCartTotalAmount'
+import { publicCart } from '@/lib/publicCart'
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -14,28 +15,20 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 			return NextResponse.json({ error: 'Нет токена корзины' })
 		}
 
-		const cartItem = await prisma.cartItem.findFirst({
+		const result = await prisma.cartItem.updateMany({
 			where: {
 				id,
-			},
-		})
-
-		if (!cartItem) {
-			return NextResponse.json({ error: 'Не найден товар в корзине' })
-		}
-
-		await prisma.cartItem.update({
-			where: {
-				id,
+				cart: { token },
 			},
 			data: {
 				quantity: data.quantity,
 			},
 		})
+		if (result.count === 0) return NextResponse.json({ error: 'Не найден товар в корзине' }, { status: 404 })
 
 		const updatedUserCart = await updateCartTotalAmount(token)
 
-		return NextResponse.json(updatedUserCart)
+		return NextResponse.json(publicCart(updatedUserCart))
 	} catch (error) {
 		console.log('[CART_PATCH] Server error', error)
 		return NextResponse.json({ message: 'Не удалось обновить корзину' }, { status: 500 })
@@ -52,25 +45,17 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 			return NextResponse.json({ error: 'Нет токена корзины' })
 		}
 
-		const cartItem = await prisma.cartItem.findFirst({
+		const result = await prisma.cartItem.deleteMany({
 			where: {
 				id,
+				cart: { token },
 			},
 		})
-
-		if (!cartItem) {
-			return NextResponse.json({ error: 'Не найден товар в корзине' })
-		}
-
-		await prisma.cartItem.delete({
-			where: {
-				id,
-			},
-		})
+		if (result.count === 0) return NextResponse.json({ error: 'Не найден товар в корзине' }, { status: 404 })
 
 		const updatedUserCart = await updateCartTotalAmount(token)
 
-		return NextResponse.json(updatedUserCart)
+		return NextResponse.json(publicCart(updatedUserCart))
 	} catch (error) {
 		console.log('[CART_DELETE] Server error', error)
 		return NextResponse.json({ message: 'Не удалось обновить корзину' }, { status: 500 })

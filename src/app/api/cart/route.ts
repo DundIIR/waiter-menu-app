@@ -3,6 +3,7 @@ import { prisma } from '../../../../prisma/prisma-client'
 import { findOrCreateCart } from '@/lib/findOrCreateCart'
 import { CreateCartItemValues } from '@/types/cart.dto'
 import { updateCartTotalAmount } from '@/lib/updateCartTotalAmount'
+import { publicCart } from '@/lib/publicCart'
 
 export async function GET(req: NextRequest) {
 	try {
@@ -33,7 +34,7 @@ export async function GET(req: NextRequest) {
 			},
 		})
 
-		return NextResponse.json(userCart)
+		return NextResponse.json(publicCart(userCart) ?? { totalAmount: 0, items: [] })
 	} catch (error) {
 		console.log('[CART_GET] Server error', error)
 		return NextResponse.json({ message: 'Не удалось получить корзину' }, { status: 500 })
@@ -108,7 +109,7 @@ export async function POST(req: NextRequest) {
 
 		const updatedUserCart = await updateCartTotalAmount(token)
 
-		const resp = NextResponse.json(updatedUserCart)
+		const resp = NextResponse.json(publicCart(updatedUserCart))
 		resp.cookies.set({ name: 'cartToken', value: token, httpOnly: true, secure: true })
 		return resp
 	} catch (error) {

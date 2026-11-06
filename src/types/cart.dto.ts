@@ -15,7 +15,7 @@ export interface CartItemDTO extends CartItem {
 	ingredients: Ingredient[]
 }
 
-export interface CartDTO extends Cart {
+export interface CartDTO extends Omit<Cart, 'token' | 'userId'> {
 	items: CartItemDTO[]
 }
 
