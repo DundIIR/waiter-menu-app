@@ -37,7 +37,7 @@ export const useFilterIngredients = (): ReturnProps => {
 		}
 
 		fetchIngredients()
-	}, [])
+	}, [setStoreIngredients])
 
 	return {
 		ingredients,

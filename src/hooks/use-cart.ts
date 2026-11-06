@@ -12,10 +12,11 @@ const UseCart = () => {
 	}
 
 	useEffect(() => {
-		if (firstLoading) {
+		const { items, loading } = useCartStore.getState()
+		if (items.length === 0 && loading) {
 			fetchCartItems()
 		}
-	}, [])
+	}, [fetchCartItems])
 
 	return {
 		totalAmount,

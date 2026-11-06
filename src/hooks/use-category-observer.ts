@@ -8,7 +8,8 @@ export function useCategoryObserver(
 	const { setActiveId } = useCategoryStore()
 
 	useEffect(() => {
-		if (ref && ref.current) {
+		const element = ref.current
+		if (element) {
 			const observer = new IntersectionObserver(
 				entries => {
 					entries.forEach(entry => {
@@ -30,12 +31,10 @@ export function useCategoryObserver(
 				},
 			)
 
-			observer.observe(ref.current)
+			observer.observe(element)
 
 			return () => {
-				if (ref.current) {
-					observer.unobserve(ref.current)
-				}
+				observer.unobserve(element)
 			}
 		}
 	}, [ref, categoryId, setActiveId])

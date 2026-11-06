@@ -1,6 +1,6 @@
 'use client'
 
-import { FC, JSX, useEffect, useState } from 'react'
+import { FC, JSX, Suspense, useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Container } from '@/components/shared/container'
 import SearchInput from './searchInput'
@@ -17,21 +17,29 @@ interface IProps {
 	className?: string
 }
 
-const Header: FC<IProps> = ({ hasSearch = true, hasCart = true, className }): JSX.Element => {
-	const [openModalAuth, setOpenModalAuth] = useState(false)
-
+const VerificationNotification = () => {
 	const searchParams = useSearchParams()
 
 	useEffect(() => {
 		if (searchParams.get('verified') === 'true') {
-			setTimeout(() => {
+			const timeout = setTimeout(() => {
 				toast.success('Аккаунт успешно подтвержден')
 			}, 1000)
+			return () => clearTimeout(timeout)
 		}
-	}, [])
+	}, [searchParams])
+
+	return null
+}
+
+const Header: FC<IProps> = ({ hasSearch = true, hasCart = true, className }): JSX.Element => {
+	const [openModalAuth, setOpenModalAuth] = useState(false)
 
 	return (
 		<header className={cn('border-b', className)}>
+			<Suspense fallback={null}>
+				<VerificationNotification />
+			</Suspense>
 			<Container className="flex-row py-8">
 				{/* Левая часть */}
 				<Link href={'/'} className="flex-row gap-4">

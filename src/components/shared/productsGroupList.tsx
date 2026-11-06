@@ -4,7 +4,6 @@ import { FC, JSX, useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils'
 import { Title } from '../ui/title'
 import ProductCard from './productCard'
-import { useIntersection } from 'react-use'
 import { useCategoryStore } from '@/store/category'
 import { ProductWithRelations } from '@/types/prisma'
 
@@ -25,14 +24,18 @@ const ProductsGroupList: FC<IProps> = ({
 }): JSX.Element => {
 	const { setActiveId } = useCategoryStore()
 
-	const intersectionRef = useRef(null)
-	const intersection = useIntersection(intersectionRef, { threshold: 0.7 })
+	const intersectionRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
-		if (intersection?.isIntersecting) {
-			setActiveId(categoryId)
-		}
-	}, [categoryId, intersection, title, setActiveId])
+		const element = intersectionRef.current
+		if (!element || typeof IntersectionObserver === 'undefined') return
+
+		const observer = new IntersectionObserver(([entry]) => {
+			if (entry.isIntersecting) setActiveId(categoryId)
+		}, { threshold: 0.7 })
+		observer.observe(element)
+		return () => observer.disconnect()
+	}, [categoryId, setActiveId])
 
 	return (
 		<div
