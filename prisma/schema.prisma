@@ -33,6 +33,7 @@ model Category {
 
 	name String
 	products Product[]
+	dishes Dish[]
 }
 
 model Product {
@@ -60,6 +61,7 @@ model Ingredient {
 	imageUrl String
 
 	products Product[]
+	dishes Dish[]
 
 	cartItems CartItem[]
 }
@@ -192,4 +194,26 @@ model StoryItem {
 	sourceUrl String
 
 	createdAt DateTime @default(now())
+}
+
+model Dish {
+	id Int @id @default(autoincrement())
+	name String
+	description String?
+	imageUrl String
+	price Int
+	weight Int
+	isPublished Boolean @default(false)
+	category Category @relation(fields: [categoryId], references: [id])
+	categoryId Int
+	ingredients Ingredient[]
+	allergens Allergen[]
+	createdAt DateTime @default(now())
+	updatedAt DateTime @updatedAt
+}
+
+model Allergen {
+	id Int @id @default(autoincrement())
+	name String
+	dishes Dish[]
 }

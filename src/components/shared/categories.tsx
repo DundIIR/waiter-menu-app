@@ -8,7 +8,7 @@ interface IProps {
 }
 
 const Categories: FC<IProps> = ({ className }): JSX.Element => {
-	const { activeId, categories } = useCategoryStore()
+	const { activeId, categories, disabled } = useCategoryStore()
 
 	return (
 		<div className={cn('inline-flex gap-1 bg-gray-50 p-1 rounded-2xl', className)}>
@@ -17,9 +17,13 @@ const Categories: FC<IProps> = ({ className }): JSX.Element => {
 					key={category.id}
 					className={cn(
 						'flex items-center font-bold h-11 rounded-2xl px-5',
-						activeId === category.id && 'bg-white shadow-md shadow-gray-200 text-primary',
+						// строка остаётся на месте, чтобы вёрстка не прыгала, но вести из неё некуда
+						disabled
+							? 'text-gray-300 pointer-events-none'
+							: activeId === category.id && 'bg-white shadow-md shadow-gray-200 text-primary',
 					)}
-					href={`#${category.name}`}>
+					aria-disabled={disabled || undefined}
+					href={disabled ? undefined : `#${category.name}`}>
 					{category.name}
 				</a>
 			))}

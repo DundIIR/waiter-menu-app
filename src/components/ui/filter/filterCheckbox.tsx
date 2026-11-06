@@ -6,8 +6,9 @@ export interface IFilterCheckbox {
 	text: string
 	value: string
 	endAdornment?: React.ReactNode
-	onCheckedChange?: (checked: boolean) => void
-	checked?: boolean
+	onCheckedChange?: (checked: boolean | 'indeterminate') => void
+	/** 'indeterminate' — часть значений группы выбрана (см. «Выбрать все») */
+	checked?: boolean | 'indeterminate'
 	className?: string
 	nameGroup?: string
 }

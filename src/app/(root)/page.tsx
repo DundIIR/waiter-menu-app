@@ -1,9 +1,13 @@
 import HomeClient from '@/components/shared/homeClient'
-import { findPizzas, GetSearchParams } from '@/lib/findPizzas'
+import { findDishes } from '@/lib/findDishes'
 
-export default async function Home({ searchParams }: { searchParams: GetSearchParams }) {
-	const params = await searchParams
-	const categories = await findPizzas(params)
+// Меню тянем из базы на каждый запрос: страница больше не зависит от searchParams,
+// и без этого Next пререндерил бы её один раз на сборке и отдавал устаревшее меню.
+export const dynamic = 'force-dynamic'
+
+export default async function Home() {
+	// Грузим всё меню целиком — фильтрация происходит на клиенте, без похода на сервер
+	const categories = await findDishes()
 
 	return <HomeClient categories={categories} />
 }
